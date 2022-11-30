@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"strings"
+
+	"github.com/chrishoffman/advent-of-code"
 )
 
 type move struct {
@@ -63,17 +63,14 @@ func problemTwo() {
 }
 
 func parseFile() []move {
-	readFile, err := os.Open("./input.txt")
+	raw, err := advent.ParseFile("./input.txt")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
 
 	var values []move
-	for fileScanner.Scan() {
-
-		parsed := strings.Split(fileScanner.Text(), " ")
+	for _, v := range raw {
+		parsed := strings.Split(v, " ")
 		if err != nil {
 			log.Fatalln(err)
 		}

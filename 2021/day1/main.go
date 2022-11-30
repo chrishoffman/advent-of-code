@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
+
+	"github.com/chrishoffman/advent-of-code"
 )
 
 func main() {
@@ -40,16 +40,14 @@ func problemTwo() {
 }
 
 func parseFile() []int {
-	readFile, err := os.Open("./input.txt")
+	raw, err := advent.ParseFile("./input.txt")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
 
 	var values []int
-	for fileScanner.Scan() {
-		value, err := strconv.Atoi(fileScanner.Text())
+	for _, v := range raw {
+		value, err := strconv.Atoi(v)
 		if err != nil {
 			log.Fatalln(err)
 		}
