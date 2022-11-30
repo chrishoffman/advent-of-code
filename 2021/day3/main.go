@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	problemOne()
-	//problemTwo()
+	//problemOne()
+	problemTwo()
 }
 
 func problemOne() {
@@ -53,24 +53,76 @@ func problemOne() {
 	fmt.Println(gamma * epsilon)
 }
 
-// func problemTwo() {
-// 	values, err := advent.ParseFile("./input.txt")
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
+func problemTwo() {
+	origValues, err := advent.ParseFile("./input.txt")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	binLen := len(origValues[0])
 
-// 	newValues :=
-// 	mostCommon := make([]int, len(values[0]))
-// 	for i, h := range v {
+	var values []string
+	values = append(values, origValues...)
+	for i := 0; i < binLen; i++ {
+		var mostCommon int
+		var ones, zeros []string
+		for _, v := range values {
+			if string(v[i]) == "1" {
+				ones = append(ones, v)
+				mostCommon++
+			} else {
+				zeros = append(zeros, v)
+				mostCommon--
+			}
+		}
 
-// 		for _, v := range values {
-// 			for i, h := range v {
-// 				if string(h) == "1" {
-// 					mostCommon[i]++
-// 				} else {
-// 					mostCommon[i]--
-// 				}
-// 			}
-// 	}
+		values = nil
+		if mostCommon >= 0 {
+			values = append(values, ones...)
+		} else {
+			values = append(values, zeros...)
+		}
 
-// }
+		if len(values) == 1 {
+			break
+		}
+	}
+
+	o2, err := strconv.ParseInt(values[0], 2, 64)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	values = nil
+	values = append(values, origValues...)
+	for i := 0; i < binLen; i++ {
+		var mostCommon int
+		var ones, zeros []string
+		for _, v := range values {
+			if string(v[i]) == "1" {
+				ones = append(ones, v)
+				mostCommon++
+			} else {
+				zeros = append(zeros, v)
+				mostCommon--
+			}
+		}
+
+		values = nil
+		if mostCommon < 0 {
+			values = append(values, ones...)
+		} else {
+			values = append(values, zeros...)
+		}
+
+		if len(values) == 1 {
+			break
+		}
+	}
+
+	co2, err := strconv.ParseInt(values[0], 2, 64)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Println(o2 * co2)
+}
