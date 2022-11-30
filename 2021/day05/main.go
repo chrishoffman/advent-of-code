@@ -26,15 +26,15 @@ func problemOne() {
 	for _, line := range lines {
 		switch {
 		case line.p1.x == line.p2.x:
-			minCoordinate := min(line.p1.y, line.p2.y)
-			maxCoordinate := max(line.p1.y, line.p2.y)
-			for y := minCoordinate; y <= maxCoordinate; y++ {
+			ys := []int{line.p1.y, line.p2.y}
+			sort.Ints(ys)
+			for y := ys[0]; y <= ys[1]; y++ {
 				plot[line.p1.x][y]++
 			}
 		case line.p1.y == line.p2.y:
-			minCoordinate := min(line.p1.x, line.p2.x)
-			maxCoordinate := max(line.p1.x, line.p2.x)
-			for x := minCoordinate; x <= maxCoordinate; x++ {
+			xs := []int{line.p1.x, line.p2.x}
+			sort.Ints(xs)
+			for x := xs[0]; x <= xs[1]; x++ {
 				plot[x][line.p1.y]++
 			}
 		}
@@ -58,35 +58,26 @@ func problemTwo() {
 	var plot [1000][1000]int
 
 	for _, line := range lines {
+		var xIncrement, yIncrement int
 		switch {
-		case line.p1.x == line.p2.x:
-			ys := []int{line.p1.y, line.p2.y}
-			sort.Ints(ys)
-			for y := ys[0]; y <= ys[1]; y++ {
-				plot[line.p1.x][y]++
-			}
-		case line.p1.y == line.p2.y:
-			xs := []int{line.p1.x, line.p2.x}
-			sort.Ints(xs)
-			for x := xs[0]; x <= xs[1]; x++ {
-				plot[x][line.p1.y]++
-			}
-		default:
-			var xIncrement, yIncrement int = 1, 1
-			if line.p1.x > line.p2.x {
-				xIncrement = -1
-			}
-			if line.p1.y > line.p2.y {
-				yIncrement = -1
-			}
+		case line.p1.x > line.p2.x:
+			xIncrement = -1
+		case line.p1.x < line.p2.x:
+			xIncrement = 1
+		}
 
-			var currX, currY int = line.p1.x, line.p1.y
-			for currX != line.p2.x+xIncrement && currY != line.p2.y+yIncrement {
-				plot[currX][currY]++
-				currX += xIncrement
-				currY += yIncrement
-			}
+		switch {
+		case line.p1.y > line.p2.y:
+			yIncrement = -1
+		case line.p1.y < line.p2.y:
+			yIncrement = 1
+		}
 
+		var x, y int = line.p1.x, line.p1.y
+		for !(x == line.p2.x+xIncrement && y == line.p2.y+yIncrement) {
+			plot[x][y]++
+			x += xIncrement
+			y += yIncrement
 		}
 	}
 
@@ -134,18 +125,4 @@ func parseCoordinate(raw string) coordinate {
 	}
 
 	return coordinate{x, y}
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
 }
