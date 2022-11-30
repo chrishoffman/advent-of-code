@@ -13,6 +13,7 @@ type board [5][5]int
 
 func main() {
 	problemOne()
+	problemTwo()
 }
 
 func problemOne() {
@@ -46,7 +47,48 @@ func problemOne() {
 		}
 
 	}
+}
 
+func problemTwo() {
+	numbers, boards := parseFile()
+
+	found := make([]board, len(boards))
+	winner := make([]bool, len(boards))
+	var winners int
+	for _, num := range numbers {
+		for i, board := range boards {
+			if winner[i] {
+				continue
+			}
+
+			var notFoundSum int
+			var rowFound, columnFound [5]int
+			for r, row := range board {
+				for c, cv := range row {
+					if found[i][r][c] == 1 || cv == num {
+						found[i][r][c] = 1
+						rowFound[r]++
+						columnFound[c]++
+					} else {
+						notFoundSum += cv
+					}
+				}
+			}
+
+			for _, v := range append(rowFound[:], columnFound[:]...) {
+				if v == 5 {
+					winner[i] = true
+					winners++
+					break
+				}
+			}
+
+			if winners == len(boards) {
+				fmt.Println(notFoundSum * num)
+				return
+			}
+		}
+	}
 }
 
 func parseFile() ([]int, []board) {
