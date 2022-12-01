@@ -34,12 +34,35 @@ func problemOne() {
 }
 
 func problemTwo() {
+	points, _ := parseFile()
+
+	minPoint := points[0]
+	maxPoint := points[len(points)-1]
+
+	prevDistance := increasingCostTotalDistance(points, minPoint)
+	for i := minPoint + 1; i < maxPoint; i++ {
+		dist := increasingCostTotalDistance(points, i)
+		if prevDistance < dist {
+			break
+		}
+		prevDistance = dist
+	}
+	fmt.Println(prevDistance)
 }
 
 func totalDistance(points []int, dest int) int {
 	var sum float64
 	for _, p := range points {
 		sum += math.Abs(float64(p) - float64(dest))
+	}
+	return int(sum)
+}
+
+func increasingCostTotalDistance(points []int, dest int) int {
+	var sum float64
+	for _, p := range points {
+		dist := math.Abs(float64(p) - float64(dest))
+		sum += (dist * (dist + 1)) / 2 // https://math.stackexchange.com/questions/593318/factorial-but-with-addition
 	}
 	return int(sum)
 }
