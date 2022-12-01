@@ -15,23 +15,14 @@ func main() {
 }
 
 func problemOne() {
-	data := parseFile()
-
-	var maxCals int
-	for _, d := range data {
-		var totalCals int
-		for _, c := range d {
-			totalCals += c
-		}
-		if totalCals > maxCals {
-			maxCals = totalCals
-		}
-	}
-
-	fmt.Println(maxCals)
+	fmt.Println(topN(1))
 }
 
 func problemTwo() {
+	fmt.Println(topN(3))
+}
+
+func topN(n int) int {
 	data := parseFile()
 
 	var total []int
@@ -43,13 +34,13 @@ func problemTwo() {
 		total = append(total, totalCals)
 	}
 	sort.Ints(total)
-	topThree := total[len(total)-3:]
+	topThree := total[len(total)-n:]
 
 	var totalCals int
 	for _, x := range topThree {
 		totalCals += x
 	}
-	fmt.Println(totalCals)
+	return totalCals
 }
 
 func parseFile() [][]int {
