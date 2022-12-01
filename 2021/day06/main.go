@@ -15,38 +15,34 @@ func main() {
 }
 
 func problemOne() {
-	// timers := parseFile()
-
-	// for i := 0; i < 80; i++ {
-	// 	for t := 0; t < len(timers); t++ {
-	// 		switch timers[t] {
-	// 		case 0:
-	// 			timers[t] = 6
-	// 			timers = append(timers, 9)
-	// 		default:
-	// 			timers[t]--
-	// 		}
-	// 	}
-	// }
-
-	// fmt.Println(len(timers))
+	fmt.Println(elapseDays(80))
 }
 
 func problemTwo() {
+	fmt.Println(elapseDays(256))
+}
+
+func elapseDays(n int) int {
 	timers := parseFile()
 
-	newTimers := map[int]int{}
-	for day := 0; day < 256; day++ {
-		for {
-			if days == 0 {
-				newTimers[6] += count
-
+	var count int
+	for i := 0; i < n; i++ {
+		count = 0
+		newTimers := map[int]int{}
+		for t, fish := range timers {
+			switch t {
+			case 0:
+				newTimers[6] += fish
+				newTimers[8] += fish
+				count += fish
+			default:
+				newTimers[t-1] += fish
 			}
+			count += fish
 		}
+		timers = newTimers
 	}
-
-	total :=
-		fmt.Println(len(timers))
+	return count
 }
 
 func parseFile() map[int]int {
