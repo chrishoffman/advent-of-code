@@ -10,6 +10,10 @@ import (
 
 type rucksack struct{ comp1, comp2 string }
 
+func (r rucksack) concat() string {
+	return fmt.Sprintf("%s%s", r.comp1, r.comp2)
+}
+
 func main() {
 	problemOne()
 	problemTwo()
@@ -21,6 +25,27 @@ func problemOne() {
 }
 
 func problemTwo() {
+	rucksacks := parseFile("./input.txt")
+	priorities := generatePriorityMap()
+
+	var totalPriority int
+	for i := 0; i < len(rucksacks); i += 3 {
+		unique := make(map[rune]map[int]bool)
+		for j := 0; j < 3; j++ {
+			for _, r := range rucksacks[j+i].concat() {
+				if _, ok := unique[r]; !ok {
+					unique[r] = make(map[int]bool)
+				}
+				unique[r][j] = true
+			}
+		}
+		for r := range unique {
+			if len(unique[r]) == 3 {
+				totalPriority += priorities[r]
+			}
+		}
+	}
+	fmt.Println(totalPriority)
 }
 
 func totalPriority(rucksacks []rucksack) int {
