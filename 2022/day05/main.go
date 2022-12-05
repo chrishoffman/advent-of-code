@@ -21,17 +21,12 @@ func problemOne() {
 		sIndex := op.start - 1
 		eIndex := op.end - 1
 
-		sCopy := make([]string, len(stacks[sIndex]))
-		eCopy := make([]string, len(stacks[eIndex]))
-		copy(sCopy, stacks[sIndex])
-		copy(eCopy, stacks[eIndex])
-
 		var items []string
 		for i := op.count - 1; i >= 0; i-- {
 			items = append(items, stacks[sIndex][i])
 		}
-		stacks[eIndex] = append(items, eCopy...)
-		stacks[sIndex] = sCopy[op.count:]
+		stacks[eIndex] = append(items, stacks[eIndex]...)
+		stacks[sIndex] = stacks[sIndex][op.count:]
 	}
 
 	var final string
@@ -50,13 +45,11 @@ func problemTwo() {
 		sIndex := op.start - 1
 		eIndex := op.end - 1
 
-		sCopy := make([]string, len(stacks[sIndex]))
-		eCopy := make([]string, len(stacks[eIndex]))
-		copy(sCopy, stacks[sIndex])
-		copy(eCopy, stacks[eIndex])
+		newStart := make([]string, len(stacks[sIndex]))
+		copy(newStart, stacks[sIndex][op.count:])
 
-		stacks[eIndex] = append(stacks[sIndex][0:op.count], eCopy...)
-		stacks[sIndex] = sCopy[op.count:]
+		stacks[eIndex] = append(stacks[sIndex][0:op.count], stacks[eIndex]...)
+		stacks[sIndex] = newStart
 	}
 
 	var final string
