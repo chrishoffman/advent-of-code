@@ -16,7 +16,7 @@ type file struct {
 }
 
 type directory struct {
-	directories map[string]*directory
+	directories map[string]directory
 	files       []file
 	size        int
 }
@@ -29,8 +29,8 @@ func main() {
 func problemOne() {
 	var total int
 
-	var f func(*directory)
-	f = func(dir *directory) {
+	var f func(directory)
+	f = func(dir directory) {
 		for _, d := range dir.directories {
 			f(d)
 		}
@@ -52,8 +52,8 @@ func problemTwo() {
 	spaceAvalable := 70000000 - dir.size
 	spaceRequired := 30000000 - spaceAvalable
 
-	var f func(*directory)
-	f = func(dir *directory) {
+	var f func(directory)
+	f = func(dir directory) {
 		for _, d := range dir.directories {
 			f(d)
 		}
@@ -68,7 +68,7 @@ func problemTwo() {
 	fmt.Println(candidateDir[0])
 }
 
-func parseFile() *directory {
+func parseFile() directory {
 	raw, err := advent.ParseFile("./input.txt")
 	if err != nil {
 		log.Fatalln(err)
@@ -78,10 +78,10 @@ func parseFile() *directory {
 	return dir
 }
 
-func parseDir(raw []string, startIndex int) (*directory, int) {
+func parseDir(raw []string, startIndex int) (directory, int) {
 	dir := directory{
 		files:       make([]file, 0),
-		directories: make(map[string]*directory),
+		directories: make(map[string]directory),
 	}
 
 	for i := startIndex; i < len(raw); i++ {
@@ -90,7 +90,7 @@ func parseDir(raw []string, startIndex int) (*directory, int) {
 		case "$":
 			if v[1] == "cd" {
 				if v[2] == ".." {
-					return &dir, i
+					return dir, i
 				}
 				i += 1
 				nested, newIndex := parseDir(raw, i)
@@ -106,5 +106,5 @@ func parseDir(raw []string, startIndex int) (*directory, int) {
 			dir.size += size
 		}
 	}
-	return &dir, len(raw)
+	return dir, len(raw)
 }
