@@ -66,9 +66,6 @@ func problemTwo() {
 
 	sort.Ints(candidateDir)
 	fmt.Println(candidateDir[0])
-
-	//13900160
-	//7015519
 }
 
 func parseFile() *directory {
@@ -87,16 +84,12 @@ func parseDir(raw []string, startIndex int) (*directory, int) {
 		directories: make(map[string]*directory),
 	}
 
-	var problemOne int
 	for i := startIndex; i < len(raw); i++ {
 		v := strings.Fields(raw[i])
 		switch v[0] {
 		case "$":
 			if v[1] == "cd" {
 				if v[2] == ".." {
-					if dir.size <= 100000 {
-						problemOne += dir.size
-					}
 					return &dir, i
 				}
 				i += 1
