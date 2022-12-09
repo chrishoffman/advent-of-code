@@ -39,6 +39,50 @@ func (c *coordinate) move(direction string) {
 	}
 }
 
+func (c *coordinate) diffMove(diff coordinate) {
+	if diff.X == 0 {
+		if diff.Y > 1 {
+			c.move("U")
+		} else if diff.Y < -1 {
+			c.move("D")
+		}
+	} else if diff.Y == 0 {
+		if diff.X > 1 {
+			c.move("R")
+		} else if diff.X < -1 {
+			c.move("L")
+		}
+	} else if diff.X > 1 {
+		c.move("R")
+		if diff.Y > 0 {
+			c.move("U")
+		} else {
+			c.move("D")
+		}
+	} else if diff.X < -1 {
+		c.move("L")
+		if diff.Y > 0 {
+			c.move("U")
+		} else {
+			c.move("D")
+		}
+	} else if diff.Y > 1 {
+		c.move("U")
+		if diff.X > 0 {
+			c.move("R")
+		} else {
+			c.move("L")
+		}
+	} else if diff.Y < -1 {
+		c.move("D")
+		if diff.X > 0 {
+			c.move("R")
+		} else {
+			c.move("L")
+		}
+	}
+}
+
 func (c *coordinate) String() string {
 	return fmt.Sprintf("%d/%d", c.X, c.Y)
 }
@@ -72,56 +116,39 @@ func problemOne() {
 			hc.move(s.direction)
 
 			diff := hc.diff(tc)
-			if diff.X == 0 {
-				if diff.Y > 1 {
-					tc.move("U")
-				} else if diff.Y < -1 {
-					tc.move("D")
-				}
-			} else if diff.Y == 0 {
-				if diff.X > 1 {
-					tc.move("R")
-				} else if diff.X < -1 {
-					tc.move("L")
-				}
-			} else if diff.X > 1 {
-				tc.move("R")
-				if diff.Y > 0 {
-					tc.move("U")
-				} else {
-					tc.move("D")
-				}
-			} else if diff.X < -1 {
-				tc.move("L")
-				if diff.Y > 0 {
-					tc.move("U")
-				} else {
-					tc.move("D")
-				}
-			} else if diff.Y > 1 {
-				tc.move("U")
-				if diff.X > 0 {
-					tc.move("R")
-				} else {
-					tc.move("L")
-				}
-			} else if diff.Y < -1 {
-				tc.move("D")
-				if diff.X > 0 {
-					tc.move("R")
-				} else {
-					tc.move("L")
-				}
-			}
+			tc.diffMove(diff)
 
 			unique[tc.String()] = true
 		}
 	}
-
 	fmt.Println(len(unique))
 }
 
 func problemTwo() {
+	steps := parseFile()
+
+	var knots []*coordinate
+	for i := 0; i < 10; i++ {
+		knots = append(knots, newCoordinate())
+	}
+
+	unique := map[string]bool{}
+	unique["0/0"] = true
+	for _, s := range steps {
+		for c := 0; c < s.steps; c++ {
+			knots[0].move(s.direction)
+
+			currentKnot := knots[0]
+			for i := 1; i < len(knots); i++ {
+				diff := currentKnot.diff(knots[i])
+				knots[i].diffMove(diff)
+				currentKnot = knots[i]
+			}
+			unique[currentKnot.String()] = true
+		}
+	}
+	fmt.Println(len(unique))
+
 }
 
 type step struct {
