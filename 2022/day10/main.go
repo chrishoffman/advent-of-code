@@ -30,7 +30,6 @@ func problemOne() {
 
 			if cycle <= 220 && (cycle-20)%40 == 0 {
 				sigSum += cycle * x
-				fmt.Println(cycle, x, cycle*x, sigSum)
 			}
 		}
 
