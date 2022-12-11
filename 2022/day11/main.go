@@ -69,7 +69,7 @@ func parseFile() ([]*monkey, int) {
 			m.items = append(m.items, lev)
 		}
 
-		opRaw := strings.Fields(strings.TrimPrefix(raw[i+1], "  Operation: new = old "))
+		opRaw := strings.Fields(raw[i+1])[4:]
 		increment, _ := strconv.Atoi(opRaw[1])
 		switch opRaw[0] {
 		case "+":
@@ -82,14 +82,14 @@ func parseFile() ([]*monkey, int) {
 			}
 		}
 
-		testRaw := strings.TrimPrefix(raw[i+2], "  Test: divisible by ")
+		testRaw := strings.Fields(raw[i+2])[3]
 		divisor, _ := strconv.Atoi(testRaw)
 		lcm *= divisor
 		m.test = func(v int) bool { return v%divisor == 0 }
 
-		trueRaw := strings.TrimPrefix(raw[i+3], "    If true: throw to monkey ")
-		falseRaw := strings.TrimPrefix(raw[i+4], "    If false: throw to monkey ")
+		trueRaw := strings.Fields(raw[i+3])[5]
 		trueDest, _ := strconv.Atoi(trueRaw)
+		falseRaw := strings.Fields(raw[i+4])[5]
 		falseDest, _ := strconv.Atoi(falseRaw)
 		m.action = map[bool]int{
 			true:  trueDest,
