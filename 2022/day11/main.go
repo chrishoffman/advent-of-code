@@ -41,8 +41,8 @@ func run(rounds int, f func(int) int) {
 		}
 	}
 
-	sort.Ints(inspections)
-	fmt.Println(inspections[len(inspections)-1] * inspections[len(inspections)-2])
+	sort.Sort(sort.Reverse(sort.IntSlice(inspections)))
+	fmt.Println(inspections[0] * inspections[1])
 }
 
 type monkey struct {
