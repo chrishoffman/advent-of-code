@@ -39,7 +39,8 @@ func (c *coordinate) move(direction string) {
 	}
 }
 
-func (c *coordinate) diffMove(diff coordinate) {
+func (c *coordinate) tailMove(head *coordinate) {
+	diff := head.diff(c)
 	if diff.X == 0 {
 		if diff.Y > 1 {
 			c.move("U")
@@ -114,10 +115,7 @@ func problemOne() {
 	for _, s := range steps {
 		for c := 0; c < s.steps; c++ {
 			hc.move(s.direction)
-
-			diff := hc.diff(tc)
-			tc.diffMove(diff)
-
+			tc.tailMove(hc)
 			unique[tc.String()] = true
 		}
 	}
@@ -133,22 +131,19 @@ func problemTwo() {
 	}
 
 	unique := map[string]bool{}
-	unique["0/0"] = true
 	for _, s := range steps {
 		for c := 0; c < s.steps; c++ {
-			knots[0].move(s.direction)
+			currentRope := knots[0]
+			currentRope.move(s.direction)
 
-			currentKnot := knots[0]
 			for i := 1; i < len(knots); i++ {
-				diff := currentKnot.diff(knots[i])
-				knots[i].diffMove(diff)
-				currentKnot = knots[i]
+				knots[i].tailMove(currentRope)
+				currentRope = knots[i]
 			}
-			unique[currentKnot.String()] = true
+			unique[currentRope.String()] = true
 		}
 	}
 	fmt.Println(len(unique))
-
 }
 
 type step struct {
