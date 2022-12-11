@@ -16,36 +16,22 @@ func main() {
 }
 
 func problemOne() {
-	monkeys, _ := parseFile()
-
-	inspections := make([]int, len(monkeys))
-	for i := 0; i < 20; i++ {
-		for m := 0; m < len(monkeys); m++ {
-			monkey := monkeys[m]
-			for _, item := range monkey.items {
-				new := monkey.operatiion(item) / uint64(3)
-				dest := monkey.action[monkey.test(new)]
-
-				monkeys[dest].items = append(monkeys[dest].items, new)
-				monkey.items = monkey.items[1:len(monkey.items)]
-				inspections[m]++
-			}
-		}
-	}
-
-	sort.Ints(inspections)
-	fmt.Println(inspections[len(inspections)-1] * inspections[len(inspections)-2])
+	run(20, func(v int) int { return v / 3 })
 }
 
 func problemTwo() {
+	run(10000, func(v int) int { return v })
+}
+
+func run(rounds int, f func(int) int) {
 	monkeys, lcm := parseFile()
 
 	inspections := make([]int, len(monkeys))
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < rounds; i++ {
 		for m := 0; m < len(monkeys); m++ {
 			monkey := monkeys[m]
 			for _, item := range monkey.items {
-				new := monkey.operatiion(item) % uint64(lcm)
+				new := f(monkey.operation(item) % lcm)
 				dest := monkey.action[monkey.test(new)]
 
 				monkeys[dest].items = append(monkeys[dest].items, new)
@@ -60,10 +46,10 @@ func problemTwo() {
 }
 
 type monkey struct {
-	items      []uint64
-	test       func(uint64) bool
-	operatiion func(uint64) uint64
-	action     map[bool]int
+	items     []int
+	test      func(int) bool
+	operation func(int) int
+	action    map[bool]int
 }
 
 func parseFile() ([]*monkey, int) {
@@ -80,26 +66,26 @@ func parseFile() ([]*monkey, int) {
 		levelsRaw := strings.Split(strings.TrimPrefix(raw[i], "  Starting items: "), ", ")
 		for _, l := range levelsRaw {
 			lev, _ := strconv.Atoi(l)
-			m.items = append(m.items, uint64(lev))
+			m.items = append(m.items, lev)
 		}
 
 		opRaw := strings.Fields(strings.TrimPrefix(raw[i+1], "  Operation: new = old "))
 		increment, _ := strconv.Atoi(opRaw[1])
 		switch opRaw[0] {
 		case "+":
-			m.operatiion = func(v uint64) uint64 { return v + uint64(increment) }
+			m.operation = func(v int) int { return v + increment }
 		case "*":
 			if increment == 0 {
-				m.operatiion = func(v uint64) uint64 { return v * v }
+				m.operation = func(v int) int { return v * v }
 			} else {
-				m.operatiion = func(v uint64) uint64 { return v * uint64(increment) }
+				m.operation = func(v int) int { return v * increment }
 			}
 		}
 
 		testRaw := strings.TrimPrefix(raw[i+2], "  Test: divisible by ")
 		divisor, _ := strconv.Atoi(testRaw)
 		lcm *= divisor
-		m.test = func(v uint64) bool { return v%uint64(divisor) == 0 }
+		m.test = func(v int) bool { return v%divisor == 0 }
 
 		trueRaw := strings.TrimPrefix(raw[i+3], "    If true: throw to monkey ")
 		falseRaw := strings.TrimPrefix(raw[i+4], "    If false: throw to monkey ")
