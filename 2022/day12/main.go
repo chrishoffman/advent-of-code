@@ -37,25 +37,30 @@ func findMinShortestPath(heightMap [][]byte, starts []position, end position) in
 
 func findShortestPath(heightMap [][]byte, start, end position) int {
 	var steps int
-	uniquePaths := make(map[string]struct{})
-	pos := newPath(start, len(heightMap[0]), len(heightMap))
+	visited := make(map[string]struct{})
+	pos := path{
+		current: start,
+		xLen:    len(heightMap[0]),
+		yLen:    len(heightMap),
+	}
 	allPaths := pos.Next()
+
 	for {
 		steps++
+		// deadend path
 		if len(allPaths) == 0 {
 			return 0
 		}
 
 		var next []path
 		for _, p := range allPaths {
-			if _, ok := uniquePaths[p.String()]; ok {
+			if _, ok := visited[p.String()]; ok {
 				continue
 			}
-			uniquePaths[p.String()] = struct{}{}
+			visited[p.String()] = struct{}{}
 
 			currHeight := heightMap[p.current.Y][p.current.X]
 			prevHeight := heightMap[p.prev.Y][p.prev.X]
-
 			if int(currHeight)-int(prevHeight) < 2 {
 				if p.current.Equal(end) {
 					return steps
@@ -67,9 +72,7 @@ func findShortestPath(heightMap [][]byte, start, end position) int {
 	}
 }
 
-type position struct {
-	X, Y int
-}
+type position struct{ X, Y int }
 
 func (c position) Equal(d position) bool {
 	return c.X == d.X && c.Y == d.Y
@@ -80,80 +83,27 @@ func (c position) String() string {
 }
 
 type path struct {
-	current    position
-	prev       position
-	visited    map[string]struct{}
-	xLen, yLen int
-}
-
-func newPath(c position, xLen, yLen int) path {
-	return path{
-		current: c,
-		prev:    c,
-		visited: make(map[string]struct{}),
-		xLen:    xLen,
-		yLen:    yLen,
-	}
+	current, prev position
+	xLen, yLen    int
 }
 
 func (p path) String() string {
 	return fmt.Sprintf("%s--%s", p.current, p.prev)
 }
 
-func (p path) Clone() path {
-	visitedCopy := make(map[string]struct{})
-	for k, v := range p.visited {
-		visitedCopy[k] = v
-	}
-	return path{
-		current: p.current,
-		prev:    p.current,
-		visited: visitedCopy,
-		xLen:    p.xLen,
-		yLen:    p.yLen,
-	}
-}
-
 func (p path) Next() []path {
 	var next []path
 
-	right := p.Clone()
-	right.current.X++
-	if right.current.X < p.xLen {
-		key := right.current.String()
-		if _, ok := right.visited[key]; !ok {
-			right.visited[key] = struct{}{}
-			next = append(next, right)
-		}
-	}
-
-	left := p.Clone()
-	left.current.X--
-	if left.current.X >= 0 {
-		key := left.current.String()
-		if _, ok := left.visited[key]; !ok {
-			left.visited[key] = struct{}{}
-			next = append(next, left)
-		}
-	}
-
-	down := p.Clone()
-	down.current.Y++
-	if down.current.Y < down.yLen {
-		key := down.current.String()
-		if _, ok := down.visited[key]; !ok {
-			down.visited[key] = struct{}{}
-			next = append(next, down)
-		}
-	}
-
-	up := p.Clone()
-	up.current.Y--
-	if up.current.Y >= 0 {
-		key := up.current.String()
-		if _, ok := up.visited[key]; !ok {
-			up.visited[key] = struct{}{}
-			next = append(next, up)
+	dirs := []position{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+	for _, dir := range dirs {
+		new := position{p.current.X + dir.X, p.current.Y + dir.Y}
+		if new.X >= 0 && new.X < p.xLen && new.Y >= 0 && new.Y < p.yLen {
+			next = append(next, path{
+				current: new,
+				prev:    p.current,
+				xLen:    p.xLen,
+				yLen:    p.yLen,
+			})
 		}
 	}
 
@@ -176,15 +126,14 @@ func parseFile(anyStart bool) ([][]byte, []position, position) {
 			switch string(val) {
 			case "S":
 				initialStart = position{c, r}
-				val = []byte("a")[0]
+				val = byte('a')
 				fallthrough
 			case "a":
 				start = append(start, position{c, r})
 			case "E":
 				end = position{c, r}
-				val = []byte("z")[0]
+				val = byte('z')
 			}
-
 			final[r][c] = val
 		}
 	}
