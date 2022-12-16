@@ -15,86 +15,74 @@ func main() {
 
 func problemOne() {
 	volcano := parseFile()
-	volcano.relievePressure()
-	fmt.Println(volcano.totalFlow)
+
+	currentValve := "AA"
+	maxTime := 30
+
+	var total int
+	for i := maxTime; i > 0; i-- {
+		fmt.Println("------------------------", currentValve)
+
+		var maxValue, pathLen int
+		closedValves := volcano.closedValves()
+		if len(closedValves) == 0 {
+			fmt.Println(total)
+			return
+		}
+		for c := 0; c < len(closedValves); c++ {
+			cost := volcano.shortestPathCost(currentValve, closedValves[c], i)
+			value := (i - cost) * volcano[closedValves[c]].flow
+			if value > maxValue {
+				maxValue = value
+				pathLen = cost
+				currentValve = closedValves[c]
+			}
+			fmt.Println(closedValves[c], cost, value, i, volcano[closedValves[c]].flow)
+		}
+		i += pathLen
+		total += maxValue
+		volcano[currentValve].state = open
+	}
+
 }
 
 func problemTwo() {
 }
 
-type volcano struct {
-	current    string
-	valves     map[string]*valve
-	openValves int
-	flow       int
-	totalFlow  int
-	timeLeft   int
-}
+type volcano map[string]*valve
 
-func (v *volcano) relievePressure() {
-	v.current = "AA"
-	v.timeLeft = 30
-	v.next()
-}
-
-func (v *volcano) next() {
-	if v.timeLeft <= 0 {
-		return
-	}
-
-	v.timeLeft--
-	v.totalFlow += v.flow
-
-	if v.openValves == len(v.valves) {
-		v.next()
-	}
-
-	fmt.Println(v.timeLeft, v.openValves, len(v.valves))
-
-	var candidate []*volcano
-	if v.valves[v.current].state == closed {
-		volcano := v.clone()
-		volcano.timeLeft--
-		volcano.valves[volcano.current].open()
-		volcano.openValves++
-		volcano.flow += volcano.valves[volcano.current].flow
-		volcano.next()
-		candidate = append(candidate, volcano)
-	}
-	for _, t := range v.valves[v.current].tunnels {
-		if v.valves[t].state == open {
-			continue
-		}
-		volcano := v.clone()
-		volcano.current = t
-		volcano.next()
-		candidate = append(candidate, volcano)
-	}
-
-	max := &volcano{}
-	for _, c := range candidate {
-		if c.totalFlow > max.totalFlow {
-			v.totalFlow = max.totalFlow
-			v.valves = max.valves
-			v.flow = max.flow
-			v.timeLeft = max.timeLeft
-			fmt.Println(c.totalFlow)
+func (v volcano) closedValves() []string {
+	var closedValves []string
+	for k, valve := range v {
+		if valve.state == closed && valve.flow > 0 {
+			closedValves = append(closedValves, k)
 		}
 	}
+	return closedValves
 }
 
-func (v *volcano) clone() *volcano {
-	new := make(map[string]*valve)
-	for k, v := range v.valves {
-		new[k] = v.clone()
-	}
-	return &volcano{
-		valves:     new,
-		current:    v.current,
-		flow:       v.flow,
-		openValves: v.openValves,
-		totalFlow:  v.totalFlow,
-		timeLeft:   v.timeLeft,
+func (v volcano) shortestPathCost(valve1, valve2 string, max int) int {
+	var cost int
+	visted := make(map[string]struct{})
+
+	next := v[valve1].tunnels
+	for {
+		cost++
+		if cost == max {
+			return max
+		}
+
+		for _, t := range next {
+			if t == valve2 {
+				return cost
+			}
+
+			if _, ok := visted[t]; ok {
+				continue
+			}
+
+			next = append(next, v[t].tunnels...)
+		}
 	}
 }
 
@@ -111,20 +99,7 @@ type valve struct {
 	tunnels []string
 }
 
-func (v *valve) open() {
-	v.state = open
-}
-
-func (v valve) clone() *valve {
-	c := &valve{
-		flow:  v.flow,
-		state: v.state,
-	}
-	c.tunnels = append(c.tunnels, v.tunnels...)
-	return c
-}
-
-func parseFile() *volcano {
+func parseFile() volcano {
 	raw, _ := advent.ParseFile("./sinput.txt")
 	valves := make(map[string]*valve)
 	for _, r := range raw {
@@ -135,7 +110,5 @@ func parseFile() *volcano {
 			tunnels: words[9:],
 		}
 	}
-	return &volcano{
-		valves: valves,
-	}
+	return valves
 }
