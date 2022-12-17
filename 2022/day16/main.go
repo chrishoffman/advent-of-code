@@ -21,29 +21,31 @@ func problemOne() {
 
 	var total int
 	for i := maxTime; i > 0; i-- {
-		fmt.Println("------------------------", currentValve)
+		fmt.Println("------------------------", currentValve, i)
 
-		var maxValue, pathLen int
 		closedValves := volcano.closedValves()
 		if len(closedValves) == 0 {
-			fmt.Println(total)
-			return
+			break
 		}
+
+		var next string
+		var maxValue, pathLen int
 		for c := 0; c < len(closedValves); c++ {
-			cost := volcano.shortestPathCost(currentValve, closedValves[c], i)
-			value := (i - cost) * volcano[closedValves[c]].flow
+			cost := volcano.shortestPath(currentValve, closedValves[c], i)
+			value := (i - cost - 1) * volcano[closedValves[c]].flow
 			if value > maxValue {
 				maxValue = value
 				pathLen = cost
-				currentValve = closedValves[c]
+				next = closedValves[c]
 			}
 			fmt.Println(closedValves[c], cost, value, i, volcano[closedValves[c]].flow)
 		}
-		i += pathLen
+		i -= pathLen
 		total += maxValue
+		currentValve = next
 		volcano[currentValve].state = open
 	}
-
+	fmt.Println(total)
 }
 
 func problemTwo() {
@@ -61,28 +63,31 @@ func (v volcano) closedValves() []string {
 	return closedValves
 }
 
-func (v volcano) shortestPathCost(valve1, valve2 string, max int) int {
+func (v volcano) shortestPath(valve1, valve2 string, max int) int {
 	var cost int
-	visted := make(map[string]struct{})
+	visited := make(map[string]struct{})
 
-	next := v[valve1].tunnels
+	all := v[valve1].tunnels
 	for {
 		cost++
 		if cost == max {
-			return max
+			return 0
 		}
 
-		for _, t := range next {
+		var next []string
+		for _, t := range all {
 			if t == valve2 {
 				return cost
 			}
 
-			if _, ok := visted[t]; ok {
+			if _, ok := visited[t]; ok {
 				continue
 			}
 
+			visited[t] = struct{}{}
 			next = append(next, v[t].tunnels...)
 		}
+		all = next
 	}
 }
 
