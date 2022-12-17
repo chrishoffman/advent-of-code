@@ -16,34 +16,29 @@ func main() {
 func problemOne() {
 	volcano := parseFile()
 
-	currentValve := "AA"
-	maxTime := 30
+	for {
+		currentValve := "AA"
+		maxTime := 30
+		totalValves := len(volcano)
 
-	var total int
-	for i := maxTime; i > 0; i-- {
-		fmt.Println("------------------------", currentValve, i)
-
-		closedValves := volcano.closedValves()
-		if len(closedValves) == 0 {
-			break
-		}
-
-		var next string
-		var maxValue, pathLen int
-		for c := 0; c < len(closedValves); c++ {
-			cost := volcano.shortestPath(currentValve, closedValves[c], i)
-			value := (i - cost - 1) * volcano[closedValves[c]].flow
-			if value > maxValue {
-				maxValue = value
-				pathLen = cost
-				next = closedValves[c]
+		var total int
+		for i := maxTime; i > 0; i-- {
+			closedValves := volcano.closedValves()
+			if len(closedValves) == 0 {
+				break
 			}
-			fmt.Println(closedValves[c], cost, value, i, volcano[closedValves[c]].flow)
+
+			var next string
+			var maxValue, pathLen int
+			for c := 0; c < len(closedValves); c++ {
+				cost := volcano.shortestPath(currentValve, closedValves[c], i)
+				value := (i - cost - 1) * volcano[closedValves[c]].flow
+			}
+			i -= pathLen
+			total += maxValue
+			currentValve = next
+			volcano[currentValve].state = open
 		}
-		i -= pathLen
-		total += maxValue
-		currentValve = next
-		volcano[currentValve].state = open
 	}
 	fmt.Println(total)
 }
