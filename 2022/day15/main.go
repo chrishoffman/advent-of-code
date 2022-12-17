@@ -24,37 +24,18 @@ func problemTwo() {
 	// sensors := parseFile()
 	// max := 20
 
-	// for y := 0; y < max+1; y++ {
-	// NEXTX:
-	// 	for x := 0; x < max+1; x++ {
-	// 		// find closest sensor
-	// 		var closest *sensor
-	// 		minDist := math.MaxInt
-	// 		for _, s := range sensors {
-	// 			if s.pt1.X == x && s.pt1.Y == y {
-	// 				break NEXTX
-	// 			}
-
-	// 			dist := sensor{coordinate{x, y}, s.pt1}.distance()
-	// 			if dist < minDist {
-	// 				minDist = dist
-	// 				closest = &s
-	// 			}
-	// 		}
-
-	// 		if closest == nil {
-	// 			fmt.Println(x*4000000 + y)
-	// 			return
-	// 		}
-
-	// 		yDiff := intDiff(closest.pt1.Y, y)
-	// 		xDiff := minDist - yDiff
-
-	// 		if xDiff > 0 {
-	// 			x += xDiff * 2
+	// for s := 0; s < len(sensors); s++ {
+	// 	sensor := sensors[s]
+	// 	// walk edge
+	// 	// check all sensors
+	// 	for c := 0; c < len(sensors); c++ {
+	// 		if c == s {
+	// 			continue
 	// 		}
 	// 	}
+
 	// }
+
 }
 
 func scan(y, minBound, maxBound int) (int, int, map[int]struct{}) {
